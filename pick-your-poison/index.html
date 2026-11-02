@@ -9,7 +9,7 @@ main{max-width:760px;margin:auto;padding:18px}.hero{text-align:center;padding:20
 @media(max-width:480px){main{padding:10px}.game{padding:16px}.choice{min-height:135px;padding:14px 12px}.choice strong{font-size:1.05rem}.how{gap:6px}.how div{padding:10px 5px}}
 </style></head><body><header><div class="logo">PICK YOUR <span>POISON</span> ⚡</div><div class="tag">THE FRIEND GROUP TEST</div></header><main>
 <section class="hero"><div class="eyebrow">No filters. No easy answers.</div><h1>WHAT WOULD<br><em>YOU PICK?</em></h1><p>Choose your side. Expose your personality. Challenge your friends. Some choices reveal more than you think.</p></section>
-<div class="tabs"><button class="tab active" data-mode="wild">🔥 Wild choices</button><button class="tab" data-mode="friends">👀 Friendship test</button><button class="tab" data-mode="deep">🧠 Deep thoughts</button></div>
+<div class="tabs"><button class="tab active" data-mode="wild">🔥 Wild choices</button><button class="tab" data-mode="friends">👀 Friendship test</button><button class="tab" data-mode="deep">🧠 Deep thoughts</button><button class="tab" id="daily" type="button">📅 Daily challenge</button></div>
 <section class="game"><div id="play"><div class="game-top"><span id="modeLabel">WILD CHOICES</span><span id="counter">1 / 10</span></div><div class="progress"><span id="bar"></span></div><div class="question" id="question">Would you rather…</div><div class="choices"><button class="choice" id="left"><small>OPTION A</small><strong></strong><span>Tap to choose</span></button><button class="choice" id="right"><small>OPTION B</small><strong></strong><span>Tap to choose</span></button></div><div class="below"><span class="subtle">There are no wrong answers… allegedly.</span><button class="btn outline" id="skip">Skip ↗</button></div></div>
 <div class="result" id="result"><div class="emoji" id="resultEmoji">😈</div><div class="eyebrow">YOUR PICKING PERSONALITY</div><h2 id="resultTitle">Chaos magnet</h2><div class="score" id="resultScore">10/10</div><p id="resultText"></p><div class="shareline">Send this to your group chat and see who agrees.</div><div class="actions"><button class="btn pink" id="share">Share my result ↗</button> <button class="btn outline" id="again">Play again</button></div></div></section>
 <section class="how"><div><b>01</b><span>Pick your answers</span></div><div><b>02</b><span>Get your vibe</span></div><div><b>03</b><span>Challenge friends</span></div></section>
@@ -26,9 +26,49 @@ const labels={wild:"WILD CHOICES",friends:"FRIENDSHIP TEST",deep:"DEEP THOUGHTS"
 function render(){const q=sets[mode][index];$("modeLabel").textContent=labels[mode];$("counter").textContent=(index+1)+" / "+sets[mode].length;$("bar").style.width=(index/sets[mode].length*100)+"%";$("question").textContent="Would you rather…";$("left").querySelector("strong").textContent=q[0];$("right").querySelector("strong").textContent=q[1];$("play").style.display="block";$("result").style.display="none"}
 function choose(n){answers.push(n);if(index<sets[mode].length-1){index++;render()}else finish()}
 function finish(){ $("play").style.display="none";$("result").style.display="block";$("bar").style.width="100%";let a=answers.filter(x=>x===0).length,b=answers.length-a;let title,emoji,desc;if(a>b){title=mode==="friends"?"The loyal wildcard":mode==="deep"?"The thoughtful rebel":"The fearless wildcard";emoji="🦁";desc="You lean towards the first option. You know what you like, and you aren't afraid to pick a side. Your friends might disagree — that's the fun."}else if(b>a){title=mode==="friends"?"The ride-or-die realist":mode==="deep"?"The curious thinker":"The plot-twist picker";emoji="🦊";desc="You lean towards the second option. You like keeping people guessing, and your choices have their own logic. Now challenge someone who thinks they know you."}else{title="Perfectly unpredictable";emoji="⚡";desc="You refuse to be boxed in. Half your answers went one way, half the other. Nobody can call your next move."}$("resultEmoji").textContent=emoji;$("resultTitle").textContent=title;$("resultScore").textContent=answers.length+" PICKS";$("resultText").textContent=desc}
-document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{mode=btn.dataset.mode;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===btn));index=0;answers=[];render()});
+document.querySelectorAll(".tab[data-mode]").forEach(btn=>btn.onclick=()=>{mode=btn.dataset.mode;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===btn));$("skip").style.display="";$("again").textContent="Play again";$("left").onclick=()=>choose(0);$("right").onclick=()=>choose(1);index=0;answers=[];render()});
 $("left").onclick=()=>choose(0);$("right").onclick=()=>choose(1);$("skip").onclick=()=>choose(Math.random()<.5?0:1);
 $("again").onclick=()=>{index=0;answers=[];render()};
 $("share").onclick=async()=>{let text="I got "+$("resultTitle").textContent+" in Pick Your Poison! 😈\n"+$("resultScore").textContent+" — can you beat my picks?\nPlay: "+location.href;if(navigator.share){try{await navigator.share({title:"Pick Your Poison",text})}catch(e){}}else if(navigator.clipboard){await navigator.clipboard.writeText(text);$("share").textContent="Copied! ✓"}else{prompt("Copy your result:",text)}};
+
+/* Daily challenge: the same date-based question for every player */
+function dailyQuestion(){
+ const all=Object.entries(sets).flatMap(([key,qs])=>qs.map(q=>({key,q})));
+ const d=new Date(); const seed=Number(d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"));
+ const item=all[seed%all.length];
+ return {item,date:d.toLocaleDateString(undefined,{day:"numeric",month:"long"})};
+}
+function openDaily(){
+ const {item,date}=dailyQuestion();
+ mode=item.key; index=0; answers=[];
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+ $("modeLabel").textContent="TODAY'S CHALLENGE · "+date.toUpperCase();
+ $("counter").textContent="DAILY PICK";
+ $("bar").style.width="0%";
+ $("question").textContent="TODAY'S BIG QUESTION";
+ $("left").querySelector("strong").textContent=item.q[0];
+ $("right").querySelector("strong").textContent=item.q[1];
+ $("play").style.display="block"; $("result").style.display="none";
+ $("skip").style.display="none";
+ $("left").onclick=()=>dailyChoose(0,item,date);
+ $("right").onclick=()=>dailyChoose(1,item,date);
+}
+function dailyChoose(n,item,date){
+ const choice=item.q[n];
+ $("play").style.display="none"; $("result").style.display="block";
+ $("resultEmoji").textContent="🔥"; $("resultTitle").textContent="Today's side: "+(n===0?"OPTION A":"OPTION B");
+ $("resultScore").textContent="YOU PICKED";
+ $("resultText").textContent="“"+choice+"” — "+date+". Challenge your friends: would they choose the same?";
+ $("share").onclick=async()=>{
+  const message="Today's Pick Your Poison challenge: “"+item.q[0]+"” OR “"+item.q[1]+"”? I chose: “"+choice+"”. What's your pick? "+location.href;
+  if(navigator.share){try{await navigator.share({title:"Today's Pick Your Poison challenge",text:message})}catch(e){}}
+  else if(navigator.clipboard){await navigator.clipboard.writeText(message);$("share").textContent="Copied! ✓"}
+  else prompt("Copy today's challenge:",message);
+ };
+ $("again").textContent="Play a full game";
+ $("again").onclick=()=>{ $("skip").style.display=""; $("again").textContent="Play again"; $("left").onclick=()=>choose(0);$("right").onclick=()=>choose(1);index=0;answers=[];render()};
+}
+
+$("daily").onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.id==="daily"));openDaily()};
 render();
 </script></body></html>
