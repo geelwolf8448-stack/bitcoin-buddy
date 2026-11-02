@@ -24,6 +24,21 @@
 </div>
 <p class="callout" style="margin-top:14px">These tools are for education and arithmetic only. They exclude fees, spreads and taxes. Recurring-buy calculations hold today's price constant and do not predict future returns. Never invest money you cannot afford to lose.</p>
 </section>
+
+<section class="section card" id="dailyQuiz">
+<div class="row"><h2>Daily Bitcoin quiz</h2><span class="label">One new question every day</span></div>
+<p class="muted">Test your knowledge in under a minute. Complete today's question to build your learning streak.</p>
+<div class="metrics" style="margin:12px 0 18px">
+<div class="metric"><span class="label">Current streak</span><strong id="quizStreak">0 days</strong></div>
+<div class="metric"><span class="label">Best streak</span><strong id="quizBest">0 days</strong></div>
+<div class="metric"><span class="label">Today's status</span><strong id="quizStatus">Not completed</strong></div>
+</div>
+<h3 id="quizQuestion" style="font-size:18px">Loading today's question…</h3>
+<div id="quizAnswers" style="display:grid;gap:9px;margin:14px 0"></div>
+<p class="status" id="quizFeedback" aria-live="polite">Choose one answer, then check it.</p>
+<button id="quizCheck" type="button">Check answer</button>
+<p class="status">Your streak is stored only in this browser on this device. It is a learning feature, not a reward or investment return.</p>
+</section>
 <section class="section grid"><div class="card"><h2>Learn before you invest</h2><p class="muted">Understand Bitcoin basics, practise calculations and learn how to spot common scams.</p><div class="actions"><a class="button" href="index.html">Open free learning guide</a></div></div><div class="card"><h2>Get the complete guide</h2><p class="muted">Download the Bitcoin Buddy guide from our store.</p><div class="actions"><a class="button" href="https://payhip.com/BitcoinBuddy" target="_blank" rel="noopener">View guide · $1.99 USD</a></div></div></section>
 <div class="callout">Market prices are indicative and may be delayed or unavailable. This page is educational only; it does not provide investment advice, execute trades, hold funds or connect to wallets. Cryptocurrency prices can rise or fall sharply.</div></main>
 <footer class="wrap footer"><div class="row"><span>© <span id="year"></span> Bitcoin Buddy</span><span>Built for learning · South Africa and beyond</span></div><p>Price data is requested from CoinGecko's public API. If the service is unavailable or rate-limited, try refreshing later.</p></footer>
@@ -39,6 +54,24 @@ const monthly=Number($('toolMonthly').value),months=Number($('toolMonths').value
 const target=Number($('toolTarget').value);if(!market.zar||!Number.isFinite(target)||target<=0){$('toolTargetResult').textContent=market.zar?'Enter a target price':'Waiting for live price'}else{const diff=(target/market.zar-1)*100;$('toolTargetResult').textContent=(diff>=0?'+':'')+diff.toFixed(2)+'% to target';}
 }
 ['toolBtc','toolRand','toolMonthly','toolMonths','toolTarget'].forEach(id=>$(id).addEventListener('input',updateDailyTools));
+
+const dailyQuestions=[
+{q:'What is one Bitcoin divided into 100 million of?',a:['Satoshis','Blocks','Wallets'],correct:0,why:'A satoshi is the smallest commonly used unit of Bitcoin: 0.00000001 BTC.'},
+{q:'Who controls Bitcoin’s network rules?',a:['One central bank','A distributed network of participants','A single private company'],correct:1,why:'Bitcoin is maintained by a distributed network; no single central bank controls it.'},
+{q:'What does a Bitcoin wallet mainly manage?',a:['Your public and private keys','Physical Bitcoin coins','A guaranteed investment account'],correct:0,why:'A wallet manages keys used to receive and authorise spending Bitcoin.'},
+{q:'What should you do if someone promises guaranteed Bitcoin profits?',a:['Send them a test payment','Share your recovery phrase','Treat it as a major scam warning'],correct:2,why:'Guaranteed returns and requests for recovery phrases are major scam warning signs.'},
+{q:'Is a Bitcoin transaction usually reversible after confirmation?',a:['No, generally not','Yes, like a card chargeback','Only by contacting Bitcoin support'],correct:0,why:'Confirmed Bitcoin transactions are generally irreversible. Check addresses carefully.'},
+{q:'What is a private key or recovery phrase?',a:['A public username','Secret information that can control funds','A market price prediction'],correct:1,why:'Anyone who gets your private key or recovery phrase may be able to take your funds.'},
+{q:'Does Bitcoin’s price stay stable?',a:['Yes, it is fixed','No, it can rise or fall sharply','Only on weekends'],correct:1,why:'Bitcoin is volatile. Never risk money you cannot afford to lose.'}
+];
+function localDay(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dayNumber(s){const [y,m,d]=s.split('-').map(Number);return Math.floor(Date.UTC(y,m-1,d)/86400000)}
+const today=localDay(),question=dailyQuestions[((dayNumber(today)%dailyQuestions.length)+dailyQuestions.length)%dailyQuestions.length];
+let selectedQuiz=-1,quizDone=false,quizState={streak:0,best:0,last:''};
+try{quizState={...quizState,...JSON.parse(localStorage.getItem('bb-quiz-streak')||'{}')}}catch(e){}
+function renderQuiz(){const already=quizState.last===today;quizDone=already;$('quizStreak').textContent=(quizState.streak||0)+' days';$('quizBest').textContent=(quizState.best||0)+' days';$('quizStatus').textContent=already?'Completed':'Not completed';$('quizQuestion').textContent=question.q;$('quizAnswers').innerHTML='';question.a.forEach((answer,i)=>{const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0b1527;color:var(--text);cursor:pointer';const radio=document.createElement('input');radio.type='radio';radio.name='dailyQuizAnswer';radio.value=String(i);radio.style.cssText='width:auto;margin:0';radio.disabled=already;radio.addEventListener('change',()=>{selectedQuiz=i});label.append(radio,document.createTextNode(answer));$('quizAnswers').append(label)});$('quizCheck').disabled=already;$('quizCheck').textContent=already?'Come back tomorrow':'Check answer';$('quizFeedback').textContent=already?'You have completed today’s question. Your streak is saved on this device.':'Choose one answer, then check it.'}
+$('quizCheck').addEventListener('click',()=>{if(quizDone)return;if(selectedQuiz<0){$('quizFeedback').textContent='Please choose an answer first.';return}if(selectedQuiz!==question.correct){$('quizFeedback').textContent='Not quite. Try again. '+question.why;return}const yesterday=dayNumber(today)-1,last=quizState.last?dayNumber(quizState.last):-999;quizState.streak=last===yesterday?(quizState.streak||0)+1:1;quizState.best=Math.max(quizState.best||0,quizState.streak);quizState.last=today;quizDone=true;try{localStorage.setItem('bb-quiz-streak',JSON.stringify(quizState))}catch(e){}renderQuiz();$('quizFeedback').textContent='Correct! '+question.why});
+renderQuiz();
 function updatePortfolio(){const q=Number($('btcAmount').value)||0,b=Number($('buyPrice').value)||0,v=market.zar===null?null:q*market.zar,i=q*b,p=v===null?null:v-i;$('portfolioValue').textContent=v===null?'Waiting for price':money(v,'ZAR');$('invested').textContent=money(i,'ZAR');$('profitLoss').textContent=p===null?'Waiting for price':money(p,'ZAR');$('profitLoss').className=p===null?'':p>=0?'positive':'negative'}
 $('savePortfolio').addEventListener('click',()=>{const q=Number($('btcAmount').value),p=Number($('buyPrice').value);if(!Number.isFinite(q)||q<0||!Number.isFinite(p)||p<0){$('portfolioStatus').textContent='Please enter zero or a positive number in both fields.';return}try{localStorage.setItem('bb-live-portfolio',JSON.stringify({q,p}));$('portfolioStatus').textContent='Saved on this device only. No account or wallet is connected.';updatePortfolio();updateDailyTools()}catch(e){$('portfolioStatus').textContent='This browser could not save your numbers.'}});$('clearPortfolio').addEventListener('click',()=>{try{localStorage.removeItem('bb-live-portfolio')}catch(e){}$('btcAmount').value='';$('buyPrice').value='';$('portfolioStatus').textContent='Saved practice numbers cleared from this browser.';updatePortfolio();updateDailyTools()});try{const s=JSON.parse(localStorage.getItem('bb-live-portfolio')||'null');if(s){$('btcAmount').value=s.q;$('buyPrice').value=s.p}}catch(e){}$('year').textContent=new Date().getFullYear();loadMarket();setInterval(loadMarket,60000);window.addEventListener('resize',()=>{if(window.bbPrices)drawChart(window.bbPrices)});
 </script></body></html>
