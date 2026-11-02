@@ -2,16 +2,29 @@
 
 A beginner-friendly, mobile-responsive Bitcoin education website for South African users.
 
-## Files
-- `index.html` — complete website (styles and JavaScript are included in this file).
+## Website pages
+
+- `index.html` — Bitcoin basics, scam-awareness guidance, a BTC/ZAR practice calculator, and links to South African financial-regulator resources.
+- `bitcoin-buddy-live.html` — indicative live BTC/ZAR and BTC/USD prices, a seven-day USD price chart, and a practice portfolio calculator.
+
+## Important limitations
+
+- Live market information is retrieved from CoinGecko. It may be delayed, rate-limited, or temporarily unavailable.
+- The homepage calculator uses the example BTC/ZAR price entered by the visitor; it is not a live quote.
+- The practice portfolio is stored only in the visitor's browser. It is not a real wallet, exchange account, or investment record.
+- Bitcoin is volatile. This educational website does not execute transactions, hold funds, provide personalised financial advice, or promise returns.
+- The Payhip link is a separate digital-product checkout. Test the full checkout and payment receipt before advertising that payments are working.
 
 ## Publish with GitHub Pages
-1. Open your repository on GitHub.
-2. Remove the old ZIP uploads if you no longer need them: open each ZIP file, tap the trash/delete option (often under `...`), and commit the deletion. If you don't see a delete option, open the file and use the `...` menu.
-3. At the repository root, choose **Add file → Upload files**.
-4. Upload **index.html** (not a ZIP file), then commit the changes.
-5. Open **Settings → Pages**. Under Build and deployment, choose **Deploy from a branch**, select your default branch (usually `main`) and folder `/ (root)`, then Save.
-6. Wait for GitHub Pages to publish. The site URL will usually be `https://YOUR-USERNAME.github.io/REPOSITORY-NAME/`.
 
-## Notes
-The calculator uses an example BTC/ZAR price entered by the visitor. It does not fetch live prices or execute transactions. The portfolio is only a practice calculator, not a real wallet.
+1. Open the repository: https://github.com/geelwolf8448-stack/bitcoin-buddy
+2. Open **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**.
+4. Select branch `main` and folder `/(root)`, then save.
+5. Wait for the Pages deployment to complete.
+
+## Public website
+
+- Homepage: https://geelwolf8448-stack.github.io/bitcoin-buddy/
+- Live tracker: https://geelwolf8448-stack.github.io/bitcoin-buddy/bitcoin-buddy-live.html
+
