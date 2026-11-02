@@ -6,8 +6,15 @@ A beginner-friendly, mobile-responsive Bitcoin education website for South Afric
 
 - `index.html` — Bitcoin basics, scam-awareness guidance, a BTC/ZAR practice calculator, and links to South African financial-regulator resources.
 - `bitcoin-buddy-live.html` — indicative live BTC/ZAR and BTC/USD prices, a seven-day USD price chart, a practice portfolio calculator, four daily-use calculators, a daily knowledge quiz, and a five-lesson beginner course with device-local progress.
+- `sponsorship.html` — proposal for a fully funded 12-month Bitcoin mining education and demonstration partnership.
 - `404.html` — helpful not-found page with links back to the main site.
 - `robots.txt` and `sitemap.xml` — basic search-engine discovery files.
+
+## Sponsorship
+
+Bitcoin Buddy is seeking a partner to provide ASIC hardware and cover hosting, electricity, maintenance, insurance and all other operating costs for a 12-month educational demonstration. The project founder cannot contribute funds; no deposits, loans, purchase costs, activation charges or withdrawal fees are acceptable.
+
+See the [sponsorship proposal](https://geelwolf8448-stack.github.io/bitcoin-buddy/sponsorship.html).
 
 ## Important limitations
 
@@ -30,4 +37,4 @@ A beginner-friendly, mobile-responsive Bitcoin education website for South Afric
 
 - Homepage: https://geelwolf8448-stack.github.io/bitcoin-buddy/
 - Live tracker: https://geelwolf8448-stack.github.io/bitcoin-buddy/bitcoin-buddy-live.html
-
+- Sponsorship proposal: https://geelwolf8448-stack.github.io/bitcoin-buddy/sponsorship.html
